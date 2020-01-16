@@ -2,51 +2,10 @@ import _classCallCheck from '@babel/runtime/helpers/classCallCheck';
 import _createClass from '@babel/runtime/helpers/createClass';
 import _possibleConstructorReturn from '@babel/runtime/helpers/possibleConstructorReturn';
 import _getPrototypeOf from '@babel/runtime/helpers/getPrototypeOf';
-import _inherits from '@babel/runtime/helpers/inherits';
 import _assertThisInitialized from '@babel/runtime/helpers/assertThisInitialized';
+import _inherits from '@babel/runtime/helpers/inherits';
 import _defineProperty from '@babel/runtime/helpers/defineProperty';
 import { Howl, Howler } from 'howler';
-
-function ImageControlFactory(Loader) {
-  return (
-    /*#__PURE__*/
-    function (_Loader) {
-      _inherits(ImageControl, _Loader);
-
-      function ImageControl() {
-        _classCallCheck(this, ImageControl);
-
-        return _possibleConstructorReturn(this, _getPrototypeOf(ImageControl).apply(this, arguments));
-      }
-
-      _createClass(ImageControl, [{
-        key: "Set",
-        value: function Set(url) {
-          return new Promise(function (resolve, reject) {
-            var image = new Image();
-
-            image.onload = function () {
-              resolve(image);
-            };
-
-            image.onerror = function (e) {
-              reject(e);
-            };
-
-            image.key = image.src = url;
-          });
-        }
-      }, {
-        key: "get",
-        value: function get(key) {
-          return this.resources[key] || ImageControl.Error || (ImageControl.Error = new Image());
-        }
-      }]);
-
-      return ImageControl;
-    }(Loader)
-  );
-}
 
 function AudioControlFactory(Loader) {
   var _temp;
@@ -122,6 +81,47 @@ function AudioControlFactory(Loader) {
   }(Loader), _temp;
 }
 
+function ImageControlFactory(Loader) {
+  return (
+    /*#__PURE__*/
+    function (_Loader) {
+      _inherits(ImageControl, _Loader);
+
+      function ImageControl() {
+        _classCallCheck(this, ImageControl);
+
+        return _possibleConstructorReturn(this, _getPrototypeOf(ImageControl).apply(this, arguments));
+      }
+
+      _createClass(ImageControl, [{
+        key: "Set",
+        value: function Set(url) {
+          return new Promise(function (resolve, reject) {
+            var image = new Image();
+
+            image.onload = function () {
+              resolve(image);
+            };
+
+            image.onerror = function (e) {
+              reject(e);
+            };
+
+            image.key = image.src = url;
+          });
+        }
+      }, {
+        key: "get",
+        value: function get(key) {
+          return this.resources[key] || ImageControl.Error || (ImageControl.Error = new Image());
+        }
+      }]);
+
+      return ImageControl;
+    }(Loader)
+  );
+}
+
 /**
  * 获得一个canvas对象
  *
@@ -161,38 +161,40 @@ function System() {
   return System;
 }
 
-function GetTouchEvent(dom, MouseEvent) {
+function GetTouchEvent(MouseEvent) {
   return {
     identifier: 0,
     changedTouches: [{
-      clientX: MouseEvent.clientX - dom.offsetLeft,
-      clientY: MouseEvent.clientY - dom.offsetTop
+      clientX: MouseEvent.clientX,
+      clientY: MouseEvent.clientY
     }]
   };
 }
 
-function MouseListen(dom, Touch) {
-  var DownState = false;
-  dom.addEventListener('mousedown', function (e) {
-    return DownState = true, Touch.onTouchStart(GetTouchEvent(dom, e));
-  }, {
-    passive: true
-  });
-  dom.addEventListener('mousemove', function (e) {
-    return DownState && Touch.onTouchMove(GetTouchEvent(dom, e));
-  }, {
-    passive: true
-  });
-  dom.addEventListener('mouseup', function (e) {
-    return DownState && (DownState = false, Touch.onTouchEnd(GetTouchEvent(dom, e)));
-  }, {
-    passive: true
-  });
-  dom.addEventListener('mouseout', function (e) {
-    return DownState && (DownState = false, Touch.onTouchEnd(GetTouchEvent(dom, e)));
-  }, {
-    passive: true
-  });
+function MouseListen() {
+  return function (event) {
+    var DownState = false;
+    window.document.body.addEventListener('mousedown', function (e) {
+      return DownState = true, event.start(GetTouchEvent(e));
+    }, {
+      passive: true
+    });
+    window.document.body.addEventListener('mousemove', function (e) {
+      return DownState && event.move(GetTouchEvent(e));
+    }, {
+      passive: true
+    });
+    window.document.body.addEventListener('mouseup', function (e) {
+      return DownState && (DownState = false, event.end(GetTouchEvent(e)));
+    }, {
+      passive: true
+    });
+    window.document.body.addEventListener('mouseout', function (e) {
+      return DownState && (DownState = false, event.end(GetTouchEvent(e)));
+    }, {
+      passive: true
+    });
+  };
 }
 /**
  * 将dom元素触摸事件和Touch类进行关联
@@ -201,28 +203,30 @@ function MouseListen(dom, Touch) {
  */
 
 
-function TouchListen(dom, Touch) {
-  if (!('ontouchstart' in window)) return MouseListen(dom, Touch);
-  dom.addEventListener('touchstart', function (e) {
-    return Touch.onTouchStart(e);
-  }, {
-    passive: true
-  });
-  dom.addEventListener('touchmove', function (e) {
-    return Touch.onTouchMove(e);
-  }, {
-    passive: true
-  });
-  dom.addEventListener('touchend', function (e) {
-    return Touch.onTouchEnd(e);
-  }, {
-    passive: true
-  });
-  dom.addEventListener('touchcancel', function (e) {
-    return Touch.onTouchEnd(e);
-  }, {
-    passive: true
-  });
+function TouchListen(useMouse) {
+  if (useMouse) return MouseListen();
+  return function (event) {
+    window.document.body.addEventListener('touchstart', function (e) {
+      return event.start(e);
+    }, {
+      passive: true
+    });
+    window.document.body.addEventListener('touchmove', function (e) {
+      return event.move(e);
+    }, {
+      passive: true
+    });
+    window.document.body.addEventListener('touchend', function (e) {
+      return event.end(e);
+    }, {
+      passive: true
+    });
+    window.document.body.addEventListener('touchcancel', function (e) {
+      return event.end(e);
+    }, {
+      passive: true
+    });
+  };
 }
 
-export { Canvas as ApiCanvas, loadFont as ApiFont, System as ApiSystem, TouchListen as ApiTouch, AudioControlFactory as ResourceAudio, ImageControlFactory as ResourceImage };
+export { AudioControlFactory, Canvas, loadFont as Font, ImageControlFactory, System, TouchListen as Touch };

@@ -3405,7 +3405,7 @@
    */
   function Canvas(width, height) {
     if (!Canvas.main) document.body.appendChild(Canvas.main = document.createElement('canvas'));
-    if (width == 'canvas') return Canvas.main;
+    if (width == 'main') return Canvas.main;
     var canvas = document.createElement('canvas');
     if (width > 0) canvas.width = width;
     if (height > 0) canvas.height = height;

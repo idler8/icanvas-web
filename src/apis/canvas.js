@@ -6,9 +6,10 @@
  * 打包模式为web时
  * key取main则该canvas将上屏
  */
-export default function Canvas(key) {
-	if (key && Canvas[key]) return Canvas[key];
+export default function Canvas(width, height) {
+	if (!Canvas.main) document.body.appendChild((Canvas.main = document.createElement('canvas')));
 	let canvas = document.createElement('canvas');
-	if (key == 'main') document.body.appendChild(canvas);
-	return key ? (Canvas[key] = canvas) : canvas;
+	if (width) canvas.width = width;
+	if (height) canvas.height = height;
+	return canvas;
 }

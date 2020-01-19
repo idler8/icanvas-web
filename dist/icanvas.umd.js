@@ -3504,9 +3504,41 @@
     };
   }
 
+  function GetMainCanvasOffset(canvas, realWidth, realHeight) {
+    var offsetWidth = realWidth;
+    var offsetLeft = 0;
+    var offsetHeight = realHeight;
+    var offsetTop = 0;
+    var ratio = realWidth / realHeight;
+
+    if (ratio < 0.4) {
+      offsetHeight = realWidth / 750 * 1334;
+      offsetTop = (realHeight - offsetHeight) / 2;
+      ratio = 750 / 1334;
+    } else if (ratio > 0.8) {
+      offsetWidth = realHeight / 1334 * 750;
+      offsetLeft = (realWidth - offsetWidth) / 2;
+      ratio = 750 / 1334;
+    }
+
+    canvas.style.position = 'absolute';
+    canvas.style.top = offsetTop + 'px';
+    canvas.style.left = offsetLeft + 'px';
+    canvas.style.width = offsetWidth + 'px';
+    canvas.style.height = offsetHeight + 'px';
+    return {
+      x: offsetLeft,
+      y: offsetTop,
+      width: offsetWidth,
+      height: offsetHeight,
+      ratio: ratio
+    };
+  }
+
   exports.AudioControlFactory = AudioControlFactory;
   exports.Canvas = Canvas;
   exports.Font = loadFont;
+  exports.GetMainCanvasOffset = GetMainCanvasOffset;
   exports.ImageControlFactory = ImageControlFactory;
   exports.System = System;
   exports.Touch = TouchListen;

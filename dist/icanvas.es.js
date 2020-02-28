@@ -1,126 +1,6 @@
 import _classCallCheck from '@babel/runtime/helpers/classCallCheck';
 import _createClass from '@babel/runtime/helpers/createClass';
-import _possibleConstructorReturn from '@babel/runtime/helpers/possibleConstructorReturn';
-import _getPrototypeOf from '@babel/runtime/helpers/getPrototypeOf';
-import _assertThisInitialized from '@babel/runtime/helpers/assertThisInitialized';
-import _inherits from '@babel/runtime/helpers/inherits';
-import _defineProperty from '@babel/runtime/helpers/defineProperty';
 import { Howl, Howler } from 'howler';
-
-function AudioControlFactory(Loader) {
-  var _temp;
-
-  return _temp =
-  /*#__PURE__*/
-  function (_Loader) {
-    _inherits(AudioControl, _Loader);
-
-    function AudioControl() {
-      var _getPrototypeOf2;
-
-      var _this;
-
-      _classCallCheck(this, AudioControl);
-
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(AudioControl)).call.apply(_getPrototypeOf2, [this].concat(args)));
-
-      _defineProperty(_assertThisInitialized(_this), "_mute", false);
-
-      return _this;
-    }
-
-    _createClass(AudioControl, [{
-      key: "get",
-      //获取音频
-      value: function get(key) {
-        return this.resources[key] || AudioControl.Error || (AudioControl.Error = new Howl({}));
-      } //静音
-
-    }, {
-      key: "Set",
-      //加载文件
-      value: function Set(url) {
-        return new Promise(function (resolve, reject) {
-          var audio = new Howl({
-            src: url,
-            loop: false,
-            autoplay: false
-          });
-          audio.once('load', function () {
-            audio.key = url;
-            resolve(audio);
-          });
-        });
-      }
-    }, {
-      key: "mute",
-      get: function get() {
-        return this._mute;
-      },
-      set: function set(mute) {
-        this._mute = mute;
-        Howler.mute(mute);
-      } //设置音量
-
-    }, {
-      key: "volume",
-      set: function set() {
-        var v = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-        Howler.volume(v);
-      },
-      get: function get() {
-        return Howler.volume();
-      }
-    }]);
-
-    return AudioControl;
-  }(Loader), _temp;
-}
-
-function ImageControlFactory(Loader) {
-  return (
-    /*#__PURE__*/
-    function (_Loader) {
-      _inherits(ImageControl, _Loader);
-
-      function ImageControl() {
-        _classCallCheck(this, ImageControl);
-
-        return _possibleConstructorReturn(this, _getPrototypeOf(ImageControl).apply(this, arguments));
-      }
-
-      _createClass(ImageControl, [{
-        key: "Set",
-        value: function Set(url) {
-          return new Promise(function (resolve, reject) {
-            var image = new Image();
-
-            image.onload = function () {
-              resolve(image);
-            };
-
-            image.onerror = function (e) {
-              reject(e);
-            };
-
-            image.key = image.src = url;
-          });
-        }
-      }, {
-        key: "get",
-        value: function get(key) {
-          return this.resources[key] || ImageControl.Error || (ImageControl.Error = new Image());
-        }
-      }]);
-
-      return ImageControl;
-    }(Loader)
-  );
-}
 
 /**
  * 获得一个canvas对象
@@ -231,6 +111,72 @@ function TouchListen(useMouse) {
   };
 }
 
+var Image =
+/*#__PURE__*/
+function () {
+  function Image() {
+    _classCallCheck(this, Image);
+  }
+
+  _createClass(Image, [{
+    key: "load",
+    value: function load(url) {
+      return new Promise(function (resolve, reject) {
+        var image = new window.Image();
+
+        image.onload = function () {
+          resolve(image);
+        };
+
+        image.onerror = function (e) {
+          reject(e);
+        };
+
+        image.key = image.src = url;
+      });
+    }
+  }]);
+
+  return Image;
+}();
+
+var Audio =
+/*#__PURE__*/
+function () {
+  function Audio() {
+    _classCallCheck(this, Audio);
+  }
+
+  _createClass(Audio, [{
+    key: "load",
+    value: function load(url) {
+      return new Promise(function (resolve, reject) {
+        var audio = new Howl({
+          src: url,
+          loop: false,
+          autoplay: false
+        });
+        audio.once('load', function () {
+          audio.key = url;
+          resolve(audio);
+        });
+      });
+    }
+  }, {
+    key: "mute",
+    value: function mute(_mute) {
+      return Howler.mute(_mute);
+    }
+  }, {
+    key: "volume",
+    value: function volume(v) {
+      return Howler.volume(v);
+    }
+  }]);
+
+  return Audio;
+}();
+
 function GetMainCanvasOffset(canvas, realWidth, realHeight) {
   var offsetWidth = realWidth;
   var offsetLeft = 0;
@@ -262,4 +208,4 @@ function GetMainCanvasOffset(canvas, realWidth, realHeight) {
   };
 }
 
-export { AudioControlFactory, Canvas, loadFont as Font, GetMainCanvasOffset, ImageControlFactory, System, TouchListen as Touch };
+export { Audio, Canvas, loadFont as Font, GetMainCanvasOffset, Image, System, TouchListen as Touch };

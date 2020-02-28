@@ -1,6 +1,6 @@
 {
 	"name": "@icanvas/core-web",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "这是icanvas的Web扩展",
 	"scripts": {
 		"build": "rollup -c"
